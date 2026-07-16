@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRコード | 作業前確認書</title>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --pink: #ff6b9d; --orange: #ff9f43; --yellow: #ffd93d;
+      --green: #6bcb77; --bg: #fff8f0; --white: #fff; --text: #2d2d2d; --muted: #999;
+    }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 32px 16px 60px;
+    }
+
+    .page-title {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    /* ===== QRカード ===== */
+    .qr-card {
+      background: var(--white);
+      border-radius: 28px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+      padding: 36px 32px 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow));
+    }
+
+    .card-logo {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+    .card-brand {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .card-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* QRコード枠 */
+    .qr-frame {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 3px solid #f0e8e0;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    /* 四隅の装飾 */
+    .qr-frame::before, .qr-frame::after {
+      content: '';
+      position: absolute;
+      width: 20px; height: 20px;
+      border-color: var(--pink);
+      border-style: solid;
+    }
+    .qr-frame::before { top: -3px; left: -3px; border-width: 3px 0 0 3px; border-radius: 6px 0 0 0; }
+    .qr-frame::after  { bottom: -3px; right: -3px; border-width: 0 3px 3px 0; border-radius: 0 0 6px 0; }
+
+    #qrcode canvas, #qrcode img { display: block; }
+
+    .qr-label {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .qr-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    /* URLバー */
+    .url-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #faf7f4;
+      border: 1.5px solid #e8e0d8;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .url-icon { font-size: 1rem; flex-shrink: 0; }
+    .url-text {
+      flex: 1;
+      font-size: 0.75rem;
+      color: var(--muted);
+      word-break: break-all;
+      line-height: 1.5;
+    }
+    .url-copy {
+      flex-shrink: 0;
+      background: var(--pink);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: opacity 0.15s;
+    }
+    .url-copy:hover { opacity: 0.85; }
+
+    /* ボタン群 */
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 14px;
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-weight: 900;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.18s, box-shadow 0.18s;
+      text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-print {
+      background: linear-gradient(135deg, var(--pink), var(--orange));
+      color: white;
+      box-shadow: 0 4px 16px rgba(255,107,157,0.3);
+    }
+    .btn-print:hover { box-shadow: 0 8px 24px rgba(255,107,157,0.4); }
+
+    .btn-open {
+      background: #f4f0ec;
+      color: var(--text);
+    }
+
+    .btn-save {
+      background: var(--text);
+      color: white;
+    }
+
+    /* 使い方ガイド */
+    .guide {
+      max-width: 420px;
+      width: 100%;
+      margin-top: 24px;
+      background: var(--white);
+      border-radius: 20px;
+      padding: 22px 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .guide-title {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-weight: 900;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+    .guide-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .guide-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: #555;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      background: linear-gradient(135deg, var(--pink), var(--orange));
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+      margin-top: 2px;
+    }
+
+    /* トースト */
+    .toast {
+      position: fixed;
+      bottom: 32px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text);
+      color: white;
+      padding: 10px 22px;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 印刷用 */
+    @media print {
+      body { background: white; padding: 0; }
+      .btn-group, .guide, .page-title, .url-bar { display: none; }
+      .qr-card { box-shadow: none; border: 1px solid #ddd; margin: 40px auto; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-title">📱 スマホなおして！</div>
+
+<div class="qr-card" id="qr-card">
+  <div class="card-logo">📋</div>
+  <div class="card-brand">作業前確認書 / 免責同意書</div>
+  <div class="card-sub">スキャンしてフォームを開いてください</div>
+
+  <div class="qr-frame">
+    <div id="qrcode"></div>
+  </div>
+
+  <div class="qr-label">📲 カメラでスキャン</div>
+  <div class="qr-desc">
+    お客様のスマホでQRコードを読み取ると<br>
+    フォームが開きます。
+  </div>
+
+  <div class="url-bar">
+    <span class="url-icon">🔗</span>
+    <span class="url-text" id="url-display">URLを入力してください</span>
+    <button class="url-copy" onclick="copyUrl()">コピー</button>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-print" onclick="window.print()">🖨️ QRコードを印刷する</button>
+    <button class="btn btn-save" onclick="downloadQR()">💾 画像として保存</button>
+    <button class="btn btn-open" onclick="openForm()">📋 フォームを確認する</button>
+  </div>
+</div>
+
+<!-- 使い方ガイド -->
+<div class="guide">
+  <div class="guide-title">💡 QRコードの使い方</div>
+  <div class="guide-steps">
+    <div class="guide-step">
+      <div class="step-num">1</div>
+      <div>このQRコードを印刷して、作業場所に貼っておく or お客様に見せる</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">2</div>
+      <div>お客様がスマホのカメラでスキャンするとフォームが開く</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">3</div>
+      <div>お客様がスマホ上で同意事項を確認・サインして完了！</div>
+    </div>
+    <div class="guide-step">
+      <div class="step-num">4</div>
+      <div>
+        <strong>フォームをWebに公開する場合：</strong><br>
+        GitHub Pages・Netlify・Googleサイトなどに
+        consent_form.html をアップロードして、そのURLをこのページの入力欄に貼り付けるとQRが更新されます。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- URL入力エリア -->
+<div style="max-width:420px;width:100%;margin-top:16px;">
+  <div style="background:white;border-radius:16px;padding:20px 22px;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+    <div style="font-family:'M PLUS Rounded 1c',sans-serif;font-weight:900;font-size:0.9rem;margin-bottom:10px;">🔧 URLを変更する</div>
+    <div style="display:flex;gap:8px;">
+      <input id="url-input" type="url" placeholder="https://yoursite.com/consent_form.html"
+        style="flex:1;padding:10px 12px;border:2px solid #e8e0d8;border-radius:10px;font-size:0.82rem;font-family:'Noto Sans JP',sans-serif;outline:none;background:#faf7f4;"
+        oninput="updateQR(this.value)">
+      <button onclick="updateQR(document.getElementById('url-input').value)"
+        style="padding:10px 16px;background:linear-gradient(135deg,var(--pink),var(--orange));color:white;border:none;border-radius:10px;font-weight:900;font-size:0.82rem;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">
+        更新
+      </button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--muted);margin-top:8px;line-height:1.6;">
+      consent_form.html をWebサーバーにアップした後、そのURLを入力するとQRが自動更新されます。
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast">コピーしました！</div>
+
+<script>
+  // デフォルトURL（サンプル）
+  const DEFAULT_URL = 'https://yoursite.com/consent_form.html';
+  let currentUrl = DEFAULT_URL;
+  let qrInstance = null;
+
+  function makeQR(url) {
+    const el = document.getElementById('qrcode');
+    el.innerHTML = '';
+    qrInstance = new QRCode(el, {
+      text: url,
+      width: 220,
+      height: 220,
+      colorDark: '#2d2d2d',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    document.getElementById('url-display').textContent = url;
+    currentUrl = url;
+  }
+
+  function updateQR(url) {
+    if (!url || url.trim() === '') return;
+    const trimmed = url.trim();
+    makeQR(trimmed);
+    showToast('QRコードを更新しました！');
+  }
+
+  function copyUrl() {
+    navigator.clipboard.writeText(currentUrl).then(() => showToast('URLをコピーしました！'));
+  }
+
+  function openForm() {
+    window.open(currentUrl, '_blank');
+  }
+
+  function downloadQR() {
+    // 少し待ってcanvasから画像取得
+    setTimeout(() => {
+      const canvas = document.querySelector('#qrcode canvas');
+      if (!canvas) { showToast('画像の取得に失敗しました'); return; }
+
+      // 余白付きで新しいcanvasに描画
+      const padding = 24;
+      const size = canvas.width + padding * 2;
+      const out = document.createElement('canvas');
+      out.width = size; out.height = size;
+      const ctx = out.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.roundRect(0, 0, size, size, 16);
+      ctx.fill();
+      ctx.drawImage(canvas, padding, padding);
+
+      const link = document.createElement('a');
+      link.download = 'consent_form_qr.png';
+      link.href = out.toDataURL('image/png');
+      link.click();
+      showToast('保存しました！');
+    }, 100);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // 初期QR生成
+  makeQR(DEFAULT_URL);
+
+  // 入力欄にフォーカス時にヒント
+  document.getElementById('url-input').addEventListener('focus', function() {
+    this.style.borderColor = '#ff6b9d';
+    this.style.boxShadow = '0 0 0 3px rgba(255,107,157,0.15)';
+  });
+  document.getElementById('url-input').addEventListener('blur', function() {
+    this.style.borderColor = '#e8e0d8';
+    this.style.boxShadow = 'none';
+  });
+</script>
+</body>
+</html>
